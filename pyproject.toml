@@ -34,7 +34,7 @@ builtins = ["Tweet"]
 
 [tool.mypy]
 plugins = ["pydantic.mypy"]
-exclude = "^(test/|tests/)"
+exclude = "^(venv/|test/|tests/)"
 follow_imports = "silent"
 warn_redundant_casts = true
 warn_unused_ignores = true

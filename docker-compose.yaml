@@ -1,0 +1,47 @@
+services:
+  db:
+    image: postgres:16
+    container_name: postgres_girumed
+    restart: always
+    env_file:
+      - .env  # Используем переменную окружения для выбора файла .env
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+      TZ: Europe/Moscow
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    command: >
+      sh -c "
+        docker-entrypoint.sh postgres &
+        until pg_isready -U ${DB_USER}; do sleep 1; done;
+        psql -U ${DB_USER} -d ${DB_NAME} -c 'CREATE DATABASE ${DB_TEST};'
+        wait"
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+        reservations:
+          memory: 256M
+    networks:
+      - girumed_net
+
+
+
+volumes:
+  pg_data:
+    name: girumed_db
+
+networks:
+  girumed_net:
+    name: girumed_net
+#    external: true
