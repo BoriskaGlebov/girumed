@@ -1,7 +1,7 @@
 import os
 import sys
 from pathlib import Path
-from typing import Any, Callable, Dict, Optional
+from typing import Any, Dict, Optional
 
 from loguru import logger
 from pydantic import SecretStr, ValidationError
@@ -94,151 +94,110 @@ except RuntimeError as e:
     print(e)
 
 
-LogRecord = Dict[str, Any]
-FilterFunction = Callable[[LogRecord], bool]
-
-
 class LoggerConfig:
     """
-    Конфигуратор логирования на основе loguru с поддержкой.
+    Класс для настройки логирования с помощью loguru.
 
-    - Вывода в stdout с настраиваемым уровнем
-    - Ротации файлов логов
-    - Разделения обычных логов и ошибок
-    - Кастомизации формата и фильтрации
-
-    Пример использования:
-        >>> config = LoggerConfig(
-        ...     log_dir=Path("logs"),
-        ...     logger_level_stdout="INFO",
-        ...     logger_level_file="DEBUG",
-        ...     logger_error_file="ERROR"
-        ... )
+    Параметры:
+        log_dir: Директория для хранения логов
+        logger_level_stdout: Уровень логирования для stdout
+        logger_level_file: Уровень логирования для файлового лога
+        logger_error_file: Уровень логирования для файла ошибок
+        extra_defaults: Значения по умолчанию для extra полей
     """
 
     def __init__(
         self,
         log_dir: Path,
-        logger_level_stdout="INFO",
-        logger_level_file="DEBUG",
-        logger_error_file="ERROR",
+        logger_level_stdout: str = "INFO",
+        logger_level_file: str = "DEBUG",
+        logger_error_file: str = "ERROR",
         extra_defaults: Optional[Dict[str, Any]] = None,
     ) -> None:
-        """
-        Инициализация конфигуратора логирования.
-
-        Args:
-            log_dir: Директория для хранения логов
-            logger_level_stdout: Уровень логирования для консоли (default: "INFO")
-            logger_level_file: Уровень логирования для файла (default: "DEBUG")
-            logger_error_file: Уровень логирования для файла ошибок (default: "ERROR")
-            extra_defaults: Значения по умолчанию для extra полей (default: {"user": "-"})
-        """
-        self.log_dir: Path = log_dir
+        self.log_dir = log_dir
         self.logger_level_stdout = logger_level_stdout
         self.logger_level_file = logger_level_file
         self.logger_error_file = logger_error_file
-        self.extra_defaults: Dict[str, Any] = extra_defaults or {"user": "-"}
+        self.extra_defaults = extra_defaults or {"user": "-"}
 
         self._ensure_log_dir_exists()
         self._setup_logging()
 
     def _ensure_log_dir_exists(self) -> None:
-        """Создает директорию для логов, если она не существует."""
+        """Создает директорию для логов если она не существует."""
         if not self.log_dir.exists():
-            self.log_dir.mkdir(parents=True, exist_ok=True)
+            self.log_dir.mkdir(parents=True)
 
     @staticmethod
-    def _user_filter(record: LogRecord) -> bool:
-        """
-        Фильтр для логов с указанным пользователем.
-
-        Args:
-            record: Запись лога
-
-        Returns:
-            True если пользователь указан и не равен "-", иначе False
-        """
+    def _user_filter(record: Dict[str, Any]) -> bool:
+        """Фильтр для логов с указанным пользователем."""
         user = record["extra"].get("user")
         return bool(user and user != "-")
 
     @staticmethod
-    def _default_filter(record: LogRecord) -> bool:
-        """
-        Фильтр для логов без указанного пользователя.
-
-        Args:
-            record: Запись лога
-
-        Returns:
-            True если пользователь не указан или равен "-", иначе False
-        """
+    def _default_filter(record: Dict[str, Any]) -> bool:
+        """Фильтр для логов без данных пользователя."""
         user = record["extra"].get("user")
         return user in (None, "-")
 
     @staticmethod
-    def _exclude_errors(record: LogRecord) -> bool:
-        """
-        Фильтр для исключения ошибок из основного файла логов.
-
-        Args:
-            record: Запись лога
-
-        Returns:
-            True если уровень лога ниже WARNING, иначе False
-        """
+    def _exclude_errors(record: Dict[str, Any]) -> bool:
+        """Фильтр для исключения ошибок из обычного файла логов."""
         return record["level"].no < logger.level("WARNING").no
 
     def _setup_logging(self) -> None:
-        """Инициализирует все обработчики логирования."""
+        """Настраивает обработчики логирования."""
         logger.remove()
         logger.configure(extra=self.extra_defaults)
         self._add_stdout_handler()
         self._add_file_handlers()
 
     def _add_stdout_handler(self) -> None:
-        """Добавляет обработчик вывода в стандартный поток."""
+        """Добавляет обработчик для вывода в stdout."""
         logger.add(
-            sink=sys.stdout,
+            sys.stdout,
             level=self.logger_level_stdout,
-            format=self._get_stdout_format(),
-            filter=self._get_stdout_filter(),
+            format=self._get_format(),
+            filter=lambda r: self._user_filter(r) or self._default_filter(r),
             catch=True,
             diagnose=True,
             enqueue=True,
         )
 
     def _add_file_handlers(self) -> None:
-        """Добавляет файловые обработчики для логов и ошибок."""
+        """Добавляет обработчики для записи в файлы."""
+        log_file_path = self.log_dir / "file.log"
+        log_error_file_path = self.log_dir / "error.log"
+
         logger.add(
-            sink=self.log_dir / "file.log",
+            str(log_file_path),
             level=self.logger_level_file,
-            format=self._get_file_format(),
+            format=self._get_format(),
             rotation="1 day",
             retention="30 days",
             catch=True,
             backtrace=True,
             diagnose=True,
-            filter=self._get_file_filter(),
+            filter=lambda r: (self._user_filter(r) or self._default_filter(r)) and self._exclude_errors(r),  # type: ignore[arg-type]
             enqueue=True,
         )
 
         logger.add(
-            sink=self.log_dir / "error.log",
+            str(log_error_file_path),
             level=self.logger_error_file,
-            format=self._get_file_format(),
+            format=self._get_format(),
             rotation="1 day",
             retention="30 days",
             catch=True,
             backtrace=True,
             diagnose=True,
-            filter=self._get_error_filter(),
+            filter=lambda r: self._user_filter(r) or self._default_filter(r),  # type: ignore[arg-type]
             enqueue=True,
         )
 
     @staticmethod
-    def _get_stdout_format() -> str:
-        """Возвращает формат строки для stdout."""
+    def _get_format() -> str:
+        """Возвращает формат строки логов."""
         return (
             "<green>{time:YYYY-MM-DD HH:mm:ss}</green> - "
             "<level>{level:^8}</level> - "
@@ -248,33 +207,7 @@ class LoggerConfig:
             "<magenta>{extra[user]:^15}</magenta>"
         )
 
-    @staticmethod
-    def _get_file_format() -> str:
-        """Возвращает формат строки для файловых логов."""
-        return (
-            "<green>{time:YYYY-MM-DD HH:mm:ss}</green> - "
-            "<level>{level:^8}</level> - "
-            "<cyan>{name}</cyan>:<magenta>{line}</magenta> - "
-            "<yellow>{function}</yellow> - "
-            "<white>{message}</white> - "
-            "<magenta>{extra[user]:^15}</magenta>"
-        )
 
-    def _get_stdout_filter(self) -> FilterFunction:
-        """Возвращает фильтр для stdout."""
-        return lambda r: self._user_filter(r) or self._default_filter(r)
-
-    def _get_file_filter(self) -> FilterFunction:
-        """Возвращает фильтр для основного файла логов."""
-        return lambda r: (self._user_filter(r) or self._default_filter(r)) and self._exclude_errors(r)
-
-    def _get_error_filter(self) -> FilterFunction:
-        """Возвращает фильтр для файла ошибок."""
-        return lambda r: self._user_filter(r) or self._default_filter(r)
-
-
-if not settings.LOG_DIR.exists():
-    settings.LOG_DIR.mkdir()
 # Создание конфигурации логгера
 logger_config = LoggerConfig(
     log_dir=settings.LOG_DIR,

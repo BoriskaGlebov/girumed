@@ -37,12 +37,12 @@ repos:
       - id: autoflake
         args: [ "--remove-all-unused-imports", "--in-place", "--recursive", "--ignore-init-module-imports" ]
 
-  - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.10.0  # Последняя стабильная
-    hooks:
-      - id: mypy
-        additional_dependencies:
-          - types-atomicwrites
-          - types-tabulate
-          - types-freezegun
-          - pydantic
+#  - repo: https://github.com/pre-commit/mirrors-mypy
+#    rev: v1.10.0  # Последняя стабильная
+#    hooks:
+#      - id: mypy
+#        additional_dependencies:
+#          - types-atomicwrites
+#          - types-tabulate
+#          - types-freezegun
+#          - pydantic

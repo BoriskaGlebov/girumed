@@ -1,3 +1,5 @@
+from typing import Awaitable, Union
+
 from fastapi import HTTPException, Request
 from fastapi.responses import JSONResponse
 from pydantic import ValidationError
@@ -6,7 +8,7 @@ from sqlalchemy.exc import IntegrityError
 from app.config import logger
 
 
-async def http_exception_handler(request: Request, exc: HTTPException) -> JSONResponse:
+async def http_exception_handler(request: Request, exc: HTTPException) -> Union[JSONResponse, Awaitable[JSONResponse]]:
     """
     Обработка исключений HTTPException.
 
@@ -21,7 +23,9 @@ async def http_exception_handler(request: Request, exc: HTTPException) -> JSONRe
     )
 
 
-async def integrity_error_exception_handler(request: Request, exc: IntegrityError) -> JSONResponse:
+async def integrity_error_exception_handler(
+    request: Request, exc: IntegrityError
+) -> Union[JSONResponse, Awaitable[JSONResponse]]:
     """
     Обработка исключений IntegrityError.
 
@@ -36,7 +40,9 @@ async def integrity_error_exception_handler(request: Request, exc: IntegrityErro
     )
 
 
-async def validation_exception_handler(request: Request, exc: ValidationError) -> JSONResponse:
+async def validation_exception_handler(
+    request: Request, exc: ValidationError
+) -> Union[JSONResponse, Awaitable[JSONResponse]]:
     """
     Обработка исключений ValidationError.
 
