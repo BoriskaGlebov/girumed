@@ -1,0 +1,48 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0  # Последняя версия (2025-07)
+    hooks:
+      - id: check-yaml
+      - id: check-json
+      - id: check-toml
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+      - id: check-merge-conflict
+      - id: check-docstring-first
+      - id: name-tests-test
+      - id: requirements-txt-fixer
+
+  - repo: https://github.com/psf/black
+    rev: 24.4.2  # Актуальная стабильная
+    hooks:
+      - id: black
+        language_version: python3.12  # Совпадает с pyproject.toml
+
+  - repo: https://github.com/PyCQA/isort
+    rev: 5.13.2
+    hooks:
+      - id: isort
+
+  - repo: https://github.com/PyCQA/flake8
+    rev: 7.1.0
+    hooks:
+      - id: flake8
+        additional_dependencies:
+          - flake8-pyproject
+          - flake8-docstrings
+
+  - repo: https://github.com/PyCQA/autoflake
+    rev: v2.3.1
+    hooks:
+      - id: autoflake
+        args: [ "--remove-all-unused-imports", "--in-place", "--recursive", "--ignore-init-module-imports" ]
+
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.10.0  # Последняя стабильная
+    hooks:
+      - id: mypy
+        additional_dependencies:
+          - types-atomicwrites
+          - types-tabulate
+          - types-freezegun
+          - pydantic
