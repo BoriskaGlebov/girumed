@@ -4,7 +4,7 @@ from typing import Any, Dict, List
 import uvicorn
 from fastapi import FastAPI, HTTPException
 from fastapi.exceptions import RequestValidationError
-from sqlalchemy.exc import IntegrityError
+from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
 from app.appointments.dao import AppointmentDAO, DoctorDAO, PatientDAO
 from app.appointments.router import router as router_appointment
@@ -21,7 +21,7 @@ from app.exceptions.exceptions_methods import (
 # API теги и их описание
 tags_metadata: List[Dict[str, Any]] = [
     {
-        "name": "appointments",
+        "name": "Appointments",
         "description": "Логика записи пациентов",
     },
 ]
@@ -49,10 +49,14 @@ async def lifespan(app: FastAPI):
         [await PatientDAO.add(session, **user.to_dict()) for user in generate_patients(5)]
         doctors = await DoctorDAO.find_all(async_session=session)
         patients = await PatientDAO.find_all(async_session=session)
-        [
-            await AppointmentDAO.add(session, **user.to_dict())
-            for user in generate_appointments(patients=patients, doctors=doctors, num_appointments=20)  # type: ignore
-        ]
+        # Генерируем приёмы
+        for user in generate_appointments(patients=patients, doctors=doctors, num_appointments=20):  # type: ignore
+            try:
+                await AppointmentDAO.add(session, **user.to_dict())
+            except ValueError as e:
+                logger.warning(f"⚠️ Не удалось создать приём: {e}")
+            except SQLAlchemyError as e:
+                logger.error(f"❌ Ошибка базы данных при создании приёма: {e}")
     yield
 
 

@@ -4,7 +4,7 @@ from typing import Any
 from pydantic import BaseModel, field_serializer
 
 
-class AppointmentRead(BaseModel):
+class RBAppointmentRead(BaseModel):
     """Схема ответа для записи на приём (Appointment)."""
 
     id: int  # Уникальный идентификатор записи

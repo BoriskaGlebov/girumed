@@ -1,20 +1,26 @@
-from pydantic import BaseModel, ConfigDict, Field
+from datetime import datetime
+from typing import Annotated, Any
+
+from pydantic import BaseModel, Field, field_serializer
 
 
-class SUserAdd(BaseModel):
+class SAppointmentCreate(BaseModel):
     """
-    Модель для добавления нового пользователя.
+    Модель данных для создания записи на приём.
 
-    Attributes:
-        id (int): Уникальный идентификатор пользователя.
-        first_name (str): Имя пользователя. Должно содержать от 1 до 50 символов.
-        last_name (str): Фамилия пользователя. Должна содержать от 1 до 50 символов.
-        api_key (str): Токен доступа для аутентификации пользователя.
+    Атрибуты:
+        doctor_id (int): Идентификатор врача.
+        patient_id (int): Идентификатор пациента.
+        start_time (datetime): Время начала приёма в формате 'YYYY-MM-DD HH:MM'.
     """
 
-    model_config = ConfigDict(from_attributes=True)
+    doctor_id: int
+    patient_id: int
+    start_time: Annotated[
+        datetime, Field(description="Время начала приёма. Формат: YYYY-MM-DD HH:MM", example="2025-07-05 10:30")
+    ]
 
-    id: int = Field(..., description="Уникальный идентификатор пользователя.")
-    first_name: str = Field(..., min_length=1, max_length=50, description="Имя пользователя, от 1 до 50 символов.")
-    last_name: str = Field(..., min_length=1, max_length=50, description="Фамилия пользователя, от 1 до 50 символов.")
-    api_key: str = Field(..., description="Токен доступа для аутентификации пользователя.")
+    @field_serializer("start_time")
+    def serialize_start_time(self, value: datetime, _info: Any) -> str:
+        """Форматирование времени в виде строки: YYYY-MM-DD HH:MM."""
+        return value.strftime("%Y-%m-%d %H:%M")
