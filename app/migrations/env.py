@@ -5,7 +5,18 @@ from sqlalchemy.ext.asyncio import create_async_engine
 
 from app.appointments.models import Appointment, Doctor, Patient
 from app.config import settings  # Импортируйте ваши настройки
-from app.database import Base  # Импортируйте ваш Base
+from app.database import DATABASE_URL, TEST_DATABASE_URL, Base  # Импортируйте ваш Base
+
+# Получение параметров из командной строки
+params = context.get_x_argument(as_dictionary=True)
+config = context.config
+# Использование параметров
+db_choice = params.get("db", "main")  # По умолчанию основная база данных
+# alembic -x db=test upgrade head
+if db_choice == "test":
+    config.set_main_option("sqlalchemy.url", TEST_DATABASE_URL)
+else:
+    config.set_main_option("sqlalchemy.url", DATABASE_URL)
 
 # Конфигурация логгирования Alembic
 if context.config.config_file_name is not None:

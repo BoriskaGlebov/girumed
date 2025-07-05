@@ -1,45 +1,47 @@
 from random import choice, randint
 from typing import Any, List
 
-import factory  # type: ignore
 import faker
+from factory.base import Factory
+from factory.declarations import LazyAttribute, LazyFunction
+from factory.faker import Faker
 
 from app.appointments.models import Appointment, Doctor, Patient
 
 faker_instance = faker.Faker("ru_RU")
 
 
-class PatientFactory(factory.Factory):
+class PatientFactory(Factory[Patient]):
     """Фабрика для генерации экземпляров модели Patient."""
 
     class Meta:
         model = Patient
 
-    name: str = factory.Faker("name", locale="ru_RU")
-    email: str = factory.LazyAttribute(lambda o: faker_instance.unique.email())
-    phone: str = factory.LazyAttribute(lambda o: faker_instance.phone_number())
+    name = Faker("name", locale="ru_RU")
+    email = LazyAttribute(lambda o: faker_instance.unique.email())
+    phone = LazyAttribute(lambda o: faker_instance.phone_number())
 
 
-class DoctorFactory(factory.Factory):
+class DoctorFactory(Factory[Doctor]):
     """Фабрика для генерации экземпляров модели Doctor."""
 
     class Meta:
         model = Doctor
 
-    name: str = factory.Faker("name", locale="ru_RU")
-    specialization: str = factory.LazyFunction(lambda: choice(["Терапевт", "Хирург", "Кардиолог", "Невролог"]))
-    experience_years: int = factory.LazyFunction(lambda: randint(1, 40))
+    name = Faker("name", locale="ru_RU")
+    specialization = LazyFunction(lambda: choice(["Терапевт", "Хирург", "Кардиолог", "Невролог"]))
+    experience_years = LazyFunction(lambda: randint(1, 40))
 
 
-class AppointmentFactory(factory.Factory):
+class AppointmentFactory(Factory[Appointment]):
     """Фабрика для генерации экземпляров модели Appointment."""
 
     class Meta:
         model = Appointment
 
-    doctor_id: int = factory.LazyFunction(lambda: randint(1, 5))
-    patient_id: int = factory.LazyFunction(lambda: randint(1, 10))
-    start_time: Any = factory.LazyFunction(lambda: faker_instance.date_time_between(start_date="now", end_date="+10d"))
+    doctor_id = LazyFunction(lambda: randint(1, 5))
+    patient_id = LazyFunction(lambda: randint(1, 10))
+    start_time = LazyFunction(lambda: faker_instance.date_time_between(start_date="now", end_date="+10d"))
 
 
 def generate_patients(num_patients: int = 10) -> List[Patient]:
@@ -52,7 +54,8 @@ def generate_patients(num_patients: int = 10) -> List[Patient]:
     Returns:
         List[Patient]: Список сгенерированных пациентов.
     """
-    return [PatientFactory() for _ in range(num_patients)]
+    out_instance = [PatientFactory() for _ in range(num_patients)]
+    return out_instance  # type: ignore
 
 
 def generate_doctors(num_doctors: int = 5) -> List[Doctor]:
@@ -65,7 +68,8 @@ def generate_doctors(num_doctors: int = 5) -> List[Doctor]:
     Returns:
         List[Doctor]: Список сгенерированных врачей.
     """
-    return [DoctorFactory() for _ in range(num_doctors)]
+    out_instance = [DoctorFactory() for _ in range(num_doctors)]
+    return out_instance  # type: ignore
 
 
 def generate_appointments(
