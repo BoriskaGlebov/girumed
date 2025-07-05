@@ -46,3 +46,4 @@ repos:
           - types-tabulate
           - types-freezegun
           - pydantic
+          - sqlalchemy

@@ -6,36 +6,24 @@ from fastapi import FastAPI, HTTPException
 from fastapi.exceptions import RequestValidationError
 from sqlalchemy.exc import IntegrityError
 
+from app.appointments.dao import AppointmentDAO, DoctorDAO, PatientDAO
+from app.appointments.router import router as router_appointment
 from app.config import logger
+from app.data_generate import generate_appointments, generate_doctors, generate_patients
+from app.database import Base, engine
+from app.dependencies import get_session
 from app.exceptions.exceptions_methods import (
     http_exception_handler,
     integrity_error_exception_handler,
     validation_exception_handler,
 )
 
-# from app.medias.dao import MediaDAO
-# from app.medias.router import router as router_medias
-# from app.tweets.dao import LikeDAO, TweetDAO, TweetMediaDAO
-# from app.tweets.router import router as router_tweets
-# from app.users.dao import FollowDAO, UserDAO
-# from app.users.router import router as router_users
-# from migrations_script import run_alembic_command
-
 # API теги и их описание
 tags_metadata: List[Dict[str, Any]] = [
     {
-        "name": "users",
-        "description": "Получаются данные по пользователям",
+        "name": "appointments",
+        "description": "Логика записи пациентов",
     },
-    {
-        "name": "tweets",
-        "description": "Операции с Твитами",
-        "externalDocs": {
-            "description": "Ссылка на документацию",
-            "url": "https://fastapi.tiangolo.com/",
-        },
-    },
-    {"name": "medias", "description": "Работа с медиафайлами"},
 ]
 
 
@@ -52,18 +40,19 @@ async def lifespan(app: FastAPI):
     #     run_alembic_command("cd ..; alembic upgrade head;alembic current")
     # elif os.path.split(os.getcwd())[1] == "kill_twitter":
     #     run_alembic_command("alembic upgrade head;alembic current")
-    # async with engine.begin() as conn:
-    #     await conn.run_sync(Base.metadata.drop_all)
-    #     await conn.run_sync(Base.metadata.create_all)
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.drop_all)
+        await conn.run_sync(Base.metadata.create_all)
 
-    # async for session in get_session():
-    #     await UserDAO.add(session, **{"first_name": "Test_name", "last_name": "Test_surname", "api_key": "test"})
-    #     [await UserDAO.add(session, **user.to_dict()) for user in generate_users(100)]
-    #     [await FollowDAO.add(session, **follow.to_dict()) for follow in generate_follow(100)]
-    #     [await MediaDAO.add(session, **MediaFactory().to_dict()) for _ in range(1, 21)]
-    #     [await TweetDAO.add(session, **TweetFactory().to_dict()) for _ in range(100)]
-    #     [await LikeDAO.add(session, **like.to_dict()) for like in generate_likes(100)]
-    #     [await TweetMediaDAO.add(session, **inst.to_dict()) for inst in generate_tweet_media(100)]
+    async for session in get_session():
+        [await DoctorDAO.add(session, **user.to_dict()) for user in generate_doctors(5)]
+        [await PatientDAO.add(session, **user.to_dict()) for user in generate_patients(5)]
+        doctors = await DoctorDAO.find_all(async_session=session)
+        patients = await PatientDAO.find_all(async_session=session)
+        [
+            await AppointmentDAO.add(session, **user.to_dict())
+            for user in generate_appointments(patients=patients, doctors=doctors, num_appointments=20)  # type: ignore
+        ]
     yield
 
 
@@ -97,23 +86,13 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# app.include_router(router_users)
-# app.include_router(router_tweets)
-# app.include_router(router_medias)
+app.include_router(router_appointment)
 
-# # для тестовой разработки подключение статических файлов
-# app.mount("/static", StaticFiles(directory=settings.static_path()), name="static")
-# templates = Jinja2Templates(directory=settings.template_path())
 
 # Определение обработчиков исключений
 app.add_exception_handler(HTTPException, http_exception_handler)  # type: ignore[arg-type]
 app.add_exception_handler(IntegrityError, integrity_error_exception_handler)  # type: ignore[arg-type]
 app.add_exception_handler(RequestValidationError, validation_exception_handler)  # type: ignore[arg-type]
-
-# @app.get("/", response_class=HTMLResponse)
-# async def hello_world(request: Request):
-#     """Роут для загрузки самой страницы."""
-#     return templates.TemplateResponse(request=request, name="index.html")
 
 
 if __name__ == "__main__":

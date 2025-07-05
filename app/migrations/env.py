@@ -3,6 +3,7 @@ from logging.config import fileConfig
 from alembic import context
 from sqlalchemy.ext.asyncio import create_async_engine
 
+from app.appointments.models import Appointment, Doctor, Patient
 from app.config import settings  # Импортируйте ваши настройки
 from app.database import Base  # Импортируйте ваш Base
 
