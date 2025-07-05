@@ -23,7 +23,6 @@ jobs:
                types-tabulate \
                types-freezegun \
                types-python-dateutil \
-               types-sqlalchemy \
                types-pyyaml
       - name: Run MyPy type checking
         run: mypy --config-file=pyproject.toml .
