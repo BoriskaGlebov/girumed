@@ -33,7 +33,10 @@ exclude = [
 builtins = ["Tweet"]
 
 [tool.mypy]
-plugins = ["pydantic.mypy"]
+plugins = [
+  "pydantic.mypy",
+  "sqlalchemy.ext.mypy.plugin"
+]
 exclude = '(venv|test|tests|build|dist|\.venv|app/main\.py)'
 follow_imports = "silent"
 warn_redundant_casts = true
