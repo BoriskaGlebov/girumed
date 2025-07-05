@@ -26,7 +26,7 @@ jobs:
                types-sqlalchemy \
                types-pyyaml
       - name: Run MyPy type checking
-        run: mypy .
+        run: mypy --config-file=pyproject.toml .
 
   black:
     runs-on: ubuntu-latest
