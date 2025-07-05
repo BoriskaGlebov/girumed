@@ -106,7 +106,7 @@ jobs:
         run: |
           make preprod
 
-      - name: Run Alembic Migrations
+      - name: Run Tests
         run: |
           sleep 10
           make check

@@ -2,7 +2,12 @@
 
 preprod:
 	@echo "📄 Копируем .env-template → .env"
-	cp .env-template .env
+	@if [ -f .env-template ] && [ ! -f .env ]; then \
+		echo "📄 Копируем .env-template → .env"; \
+		cp .env-template .env; \
+	else \
+		echo "⚠️ Либо .env-template отсутствует, либо .env уже существует — пропускаем копирование"; \
+	fi
 	chmod +x init.sh
 
 	@echo "🐳 Запускаем docker compose с пересборкой..."
