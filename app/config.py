@@ -127,6 +127,8 @@ class LoggerConfig:
         """Создает директорию для логов если она не существует."""
         if not self.log_dir.exists():
             self.log_dir.mkdir(parents=True)
+            # Дать права: rwx для владельца, rx для группы и других (755)
+            os.chmod(self.log_dir, 0o777)
 
     @staticmethod
     def _user_filter(record: Mapping[str, Any]) -> bool:

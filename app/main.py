@@ -99,5 +99,11 @@ app.add_exception_handler(IntegrityError, integrity_error_exception_handler)  # 
 app.add_exception_handler(RequestValidationError, validation_exception_handler)  # type: ignore[arg-type]
 
 
+@app.get("/health")
+async def health_check():
+    """Проверка статуса контейнера."""
+    return {"status": "ok"}
+
+
 if __name__ == "__main__":
     uvicorn.run(app="main:app", host="0.0.0.0", port=8000, reload=True)
