@@ -1,8 +1,8 @@
-"""add models
+"""add cascade
 
-Revision ID: f3734ec1cdbd
+Revision ID: 7a7cbcf0f1c8
 Revises: 889fa333af67
-Create Date: 2025-07-05 11:38:28.756878
+Create Date: 2025-07-05 17:51:56.156722
 
 """
 
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 from alembic import op
 
 # revision identifiers, used by Alembic.
-revision: str = "f3734ec1cdbd"
+revision: str = "7a7cbcf0f1c8"
 down_revision: Union[str, Sequence[str], None] = "889fa333af67"
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -50,14 +50,8 @@ def upgrade() -> None:
         sa.Column("start_time", sa.DateTime(), nullable=False),
         sa.Column("created_at", sa.DateTime(), server_default=sa.text("now()"), nullable=False),
         sa.Column("updated_at", sa.DateTime(), server_default=sa.text("now()"), nullable=False),
-        sa.ForeignKeyConstraint(
-            ["doctor_id"],
-            ["doctors.id"],
-        ),
-        sa.ForeignKeyConstraint(
-            ["patient_id"],
-            ["patients.id"],
-        ),
+        sa.ForeignKeyConstraint(["doctor_id"], ["doctors.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(["patient_id"], ["patients.id"], ondelete="CASCADE"),
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("doctor_id", "start_time", name="unique_doctor_slot"),
     )

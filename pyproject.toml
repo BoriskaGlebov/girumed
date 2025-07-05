@@ -37,7 +37,7 @@ plugins = [
   "pydantic.mypy",
   "sqlalchemy.ext.mypy.plugin"
 ]
-exclude = '(venv|test|tests|build|dist|\.venv|app/main\.py)'
+exclude = '(venv|test|tests|build|dist|\.venv|app/main\.py|app/migrations/env\.py)'
 follow_imports = "silent"
 warn_redundant_casts = true
 ignore_missing_imports = true

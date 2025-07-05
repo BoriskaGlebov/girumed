@@ -72,8 +72,8 @@ class Appointment(Base):
     """
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    doctor_id: Mapped[int] = mapped_column(ForeignKey("doctors.id"), nullable=False)
-    patient_id: Mapped[int] = mapped_column(ForeignKey("patients.id"), nullable=False)
+    doctor_id: Mapped[int] = mapped_column(ForeignKey("doctors.id", ondelete="CASCADE"), nullable=False)
+    patient_id: Mapped[int] = mapped_column(ForeignKey("patients.id", ondelete="CASCADE"), nullable=False)
     start_time: Mapped[datetime] = mapped_column(nullable=False)
 
     doctor: Mapped["Doctor"] = relationship(back_populates="appointments")

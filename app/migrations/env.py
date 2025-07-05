@@ -47,7 +47,7 @@ async def run_async_migrations() -> None:
     Основная функция для асинхронного выполнения миграций.
     """
     connectable = create_async_engine(
-        settings.get_db_url(),
+        config.get_main_option("sqlalchemy.url"),
         poolclass=None,
     )
 

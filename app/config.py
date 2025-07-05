@@ -230,3 +230,5 @@ if __name__ == "__main__":
     logger.error("asdasd")
     logger.bind(user="Boris").warning("Сообщение")
     logger.bind(filename="Boris_file.txt").error("Сообщение")
+    print(settings.get_db_url())
+    print(settings.get_test_db_url())
