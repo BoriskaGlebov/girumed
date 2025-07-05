@@ -37,6 +37,7 @@ plugins = ["pydantic.mypy"]
 exclude = '(venv|test|tests|build|dist|\.venv|app/main\.py)'
 follow_imports = "silent"
 warn_redundant_casts = true
+ignore_missing_imports = true
 warn_unused_ignores = false
 disallow_any_generics = true
 check_untyped_defs = true
