@@ -13,7 +13,7 @@ repos:
       - id: requirements-txt-fixer
 
   - repo: https://github.com/psf/black
-    rev: 24.4.2  # Актуальная стабильная
+    rev: 25.1.0  # Актуальная стабильная
     hooks:
       - id: black
         language_version: python3.12  # Совпадает с pyproject.toml
@@ -24,7 +24,7 @@ repos:
       - id: isort
 
   - repo: https://github.com/PyCQA/flake8
-    rev: 7.1.0
+    rev: 7.3.0
     hooks:
       - id: flake8
         additional_dependencies:
@@ -37,12 +37,12 @@ repos:
       - id: autoflake
         args: [ "--remove-all-unused-imports", "--in-place", "--recursive", "--ignore-init-module-imports" ]
 
-#  - repo: https://github.com/pre-commit/mirrors-mypy
-#    rev: v1.10.0  # Последняя стабильная
-#    hooks:
-#      - id: mypy
-#        additional_dependencies:
-#          - types-atomicwrites
-#          - types-tabulate
-#          - types-freezegun
-#          - pydantic
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.16.1  # Последняя стабильная
+    hooks:
+      - id: mypy
+        additional_dependencies:
+          - types-atomicwrites
+          - types-tabulate
+          - types-freezegun
+          - pydantic

@@ -1,7 +1,7 @@
 import os
 import sys
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Mapping, Optional
 
 from loguru import logger
 from pydantic import SecretStr, ValidationError
@@ -129,19 +129,19 @@ class LoggerConfig:
             self.log_dir.mkdir(parents=True)
 
     @staticmethod
-    def _user_filter(record: Dict[str, Any]) -> bool:
+    def _user_filter(record: Mapping[str, Any]) -> bool:
         """Фильтр для логов с указанным пользователем."""
         user = record["extra"].get("user")
         return bool(user and user != "-")
 
     @staticmethod
-    def _default_filter(record: Dict[str, Any]) -> bool:
+    def _default_filter(record: Mapping[str, Any]) -> bool:
         """Фильтр для логов без данных пользователя."""
         user = record["extra"].get("user")
         return user in (None, "-")
 
     @staticmethod
-    def _exclude_errors(record: Dict[str, Any]) -> bool:
+    def _exclude_errors(record: Mapping[str, Any]) -> bool:
         """Фильтр для исключения ошибок из обычного файла логов."""
         return record["level"].no < logger.level("WARNING").no
 
@@ -178,7 +178,7 @@ class LoggerConfig:
             catch=True,
             backtrace=True,
             diagnose=True,
-            filter=lambda r: (self._user_filter(r) or self._default_filter(r)) and self._exclude_errors(r),  # type: ignore[arg-type]
+            filter=lambda r: (self._user_filter(r) or self._default_filter(r)) and self._exclude_errors(r),
             enqueue=True,
         )
 
@@ -191,7 +191,7 @@ class LoggerConfig:
             catch=True,
             backtrace=True,
             diagnose=True,
-            filter=lambda r: self._user_filter(r) or self._default_filter(r),  # type: ignore[arg-type]
+            filter=lambda r: self._user_filter(r) or self._default_filter(r),
             enqueue=True,
         )
 
