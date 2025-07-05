@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import Any, Dict, Mapping, Optional
 
 from loguru import logger
-from pydantic import SecretStr, ValidationError
+from pydantic import Field, SecretStr, ValidationError
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 env_file_local: str = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".env")
@@ -25,6 +25,8 @@ class Settings(BaseSettings):
         PYTHONPATH (str): Путь к Python.
     """
 
+    ENV: str = Field(default="db")  # default = local, но может быть 'container' или 'prod'
+
     DB_USER: str
     DB_PASSWORD: SecretStr
     DB_HOST: str
@@ -39,6 +41,12 @@ class Settings(BaseSettings):
 
     model_config = SettingsConfigDict(extra="ignore")
 
+    def _resolve_host(self) -> str:
+        """Возвращает правильный хост базы данных в зависимости от ENV."""
+        if self.ENV == "local":
+            return "localhost"
+        return self.DB_HOST  # обычно "db" в docker-compose
+
     def get_db_url(self) -> str:
         """
         Получает URL для основной базы данных.
@@ -47,7 +55,7 @@ class Settings(BaseSettings):
         """
         return (
             f"postgresql+asyncpg://{self.DB_USER}:{self.DB_PASSWORD.get_secret_value()}@"
-            f"{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
+            f"{self._resolve_host()}:{self.DB_PORT}/{self.DB_NAME}"
         )
 
     def get_test_db_url(self) -> str:
@@ -58,7 +66,7 @@ class Settings(BaseSettings):
         """
         return (
             f"postgresql+asyncpg://{self.DB_USER}:{self.DB_PASSWORD.get_secret_value()}@"
-            f"{self.DB_HOST}:{self.DB_PORT}/{self.DB_TEST}"
+            f"{self._resolve_host()}:{self.DB_PORT}/{self.DB_TEST}"
         )
 
     @classmethod
