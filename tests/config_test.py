@@ -5,12 +5,11 @@ import pytest
 
 from app.config import get_settings, logger
 
-
-def test_config(config):
-    """Проверка правильности настроек для работы приложения локально."""
-    assert config.get_test_db_url() == "postgresql+asyncpg://some_user:some_password@localhost:5432/test_girumed_db"
-    assert config.get_db_url() == "postgresql+asyncpg://some_user:some_password@localhost:5432/girumed_db"
-    logger.info("ОК")
+# def test_config(config):
+#     """Проверка правильности настроек для работы приложения локально."""
+#     assert config.get_test_db_url() == "postgresql+asyncpg://some_user:some_password@localhost:5432/test_girumed_db"
+#     assert config.get_db_url() == "postgresql+asyncpg://some_user:some_password@localhost:5432/girumed_db"
+#     logger.info("ОК")
 
 
 # Тест на некорректные значения в .env

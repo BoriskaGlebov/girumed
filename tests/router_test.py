@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.appointments.models import Appointment, Doctor, Patient
 
 
-@pytest.mark.asyncio(scope="session")
+@pytest.mark.asyncio(loop_scope="session")
 async def test_get_appointment_by_id_success(
     async_client: AsyncClient,
     test_db: AsyncSession,
@@ -24,7 +24,7 @@ async def test_get_appointment_by_id_success(
     assert data["patient_id"] == test_appointment.patient_id
 
 
-@pytest.mark.asyncio(scope="session")
+@pytest.mark.asyncio(loop_scope="session")
 async def test_get_appointment_not_found(
     async_client: AsyncClient,
     test_db: AsyncSession,
@@ -35,7 +35,7 @@ async def test_get_appointment_not_found(
     assert response.json()["error_message"] == "Запись не найдена"
 
 
-@pytest.mark.asyncio(scope="session")
+@pytest.mark.asyncio(loop_scope="session")
 async def test_create_appointment_success(
     test_doctor: Doctor,
     test_patient2: Patient,
@@ -58,7 +58,7 @@ async def test_create_appointment_success(
     assert data["patient_id"] == payload["patient_id"]
 
 
-@pytest.mark.asyncio(scope="session")
+@pytest.mark.asyncio(loop_scope="session")
 async def test_create_appointment_conflict(
     test_doctor: Doctor,
     test_patient1: Patient,
@@ -78,7 +78,7 @@ async def test_create_appointment_conflict(
     assert "занято" in response.json()["error_message"]
 
 
-@pytest.mark.asyncio(scope="session")
+@pytest.mark.asyncio(loop_scope="session")
 async def test_create_appointment_doctor_not_found(
     test_patient1: Patient,
     async_client: AsyncClient,
@@ -97,7 +97,7 @@ async def test_create_appointment_doctor_not_found(
     assert "Доктор" in response.json()["error_message"]
 
 
-@pytest.mark.asyncio(scope="session")
+@pytest.mark.asyncio(loop_scope="session")
 async def test_create_appointment_patient_not_found(
     test_doctor: Doctor,
     async_client: AsyncClient,

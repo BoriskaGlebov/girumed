@@ -5,7 +5,7 @@ from app.appointments.dao import PatientDAO
 from app.appointments.models import Patient
 
 
-@pytest.mark.asyncio(scope="session")
+@pytest.mark.asyncio(loop_scope="session")
 async def test_patient_add_find_one(async_client, test_db: AsyncSession) -> None:
     """Тест добавления пациента и поиска его по ID и email."""
     patient_data = {
@@ -32,7 +32,7 @@ async def test_patient_add_find_one(async_client, test_db: AsyncSession) -> None
     assert found2.name == patient_data["name"]
 
 
-@pytest.mark.asyncio(scope="session")
+@pytest.mark.asyncio(loop_scope="session")
 async def test_patient_find_all_and_update_and_delete(async_client, test_db: AsyncSession) -> None:
     """Тест поиска всех пациентов, обновления и удаления одного из них."""
     # Получаем всех пациентов (предполагается, что база уже наполнена)
