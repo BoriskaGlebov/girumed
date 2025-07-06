@@ -104,9 +104,20 @@ jobs:
 
       - name: Build and run Docker Compose
         run: |
-          make preprod
+          make up
 
-      - name: Run Tests
+      - name: Run Tests with retries
         run: |
-          sleep 10
-          make check
+          n=0
+          until [ $n -ge 3 ]
+          do
+            make check && break
+            n=$((n+1))
+            echo "Тесты не прошли, попытка $n из 3"
+            sleep 5
+          done
+
+          if [ $n -eq 3 ]; then
+            echo "Тесты не прошли после 3 попыток"
+            exit 1
+          fi
