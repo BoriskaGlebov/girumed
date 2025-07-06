@@ -25,7 +25,7 @@ test:
 	ENV=local pytest tests
 test-CI:
 	@echo "🧪 Запуск тестов CI..."
-	docker compose exec web pytest tests
+	docker compose exec api pytest tests
 
 # Полная проверка: линтеры + тесты
 check: lint test test-CI
