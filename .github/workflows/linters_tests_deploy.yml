@@ -106,6 +106,6 @@ jobs:
         run: |
           make up
 
-      - name: Run Tests with retries
+      - name: Run Tests
         run: |
-          docker exec web pytest tests
+          docker compose  exec web pytest tests
