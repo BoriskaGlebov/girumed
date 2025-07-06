@@ -131,7 +131,7 @@ jobs:
           n=0
           until [ $n -ge 3 ]
           do
-            make test-CI && break
+            make test && break
             n=$((n+1))
             echo "Тесты не прошли, попытка $n из 3"
             sleep 5
