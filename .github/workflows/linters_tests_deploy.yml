@@ -104,8 +104,8 @@ jobs:
 
       - name: Build and run Docker Compose
         run: |
-          make up && make test
+          make up
 
       - name: Run Tests with retries
         run: |
-          make test
+          docker exec web pytest tests

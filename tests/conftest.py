@@ -40,7 +40,7 @@ async def clean_database() -> None:
     if cwd == "tests":
         run_alembic_command("cd ..; alembic -x db=test upgrade head; alembic -x db=test current")
     elif cwd == "girumed":
-        run_alembic_command("ENV=local alembic -x db=test upgrade head; alembic -x db=test current")
+        run_alembic_command("alembic -x db=test upgrade head; alembic -x db=test current")
 
     async with async_test_session() as session:
         await session.execute(text("TRUNCATE TABLE appointments RESTART IDENTITY CASCADE;"))
