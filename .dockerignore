@@ -4,4 +4,4 @@ pyproject.toml
 .gitignore
 .github
 app/logs
-Док-артефакты/
+doc_artefacts/
