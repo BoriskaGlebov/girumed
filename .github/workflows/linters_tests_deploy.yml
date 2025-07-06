@@ -28,8 +28,14 @@ jobs:
         run: |
           mkdir -p reports
           mypy --config-file=pyproject.toml --linecount-report reports .
-          total_line=$(tail -1 reports/linecount-report.txt | awk '{print $2}')
-          typed_line=$(tail -1 reports/linecount-report.txt | awk '{print $1}')
+
+          if [[ ! -f reports/total.txt ]]; then
+            echo "❌ MyPy total report not found"
+            exit 1
+          fi
+
+          total_line=$(awk '{total+=$2} END {print total}' reports/total.txt)
+          typed_line=$(awk '{typed+=$1} END {print typed}' reports/total.txt)
           percent=$(echo "scale=2; 100 * $typed_line / $total_line" | bc)
 
           echo "🔍 MyPy type coverage: $percent%"
@@ -41,6 +47,7 @@ jobs:
           else
             echo "✅ Type coverage is sufficient ($percent%)"
           fi
+
 
   black:
     runs-on: ubuntu-latest
