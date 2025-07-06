@@ -42,7 +42,7 @@ services:
     #      build:
     #        context: .
     #        dockerfile: Dockerfile
-    #      container_name: fastapi_girumed
+    container_name: fastapi_girumed
     env_file:
       - .env
     ports:
