@@ -24,8 +24,23 @@ jobs:
                types-freezegun \
                types-python-dateutil \
                types-pyyaml
-      - name: Run MyPy type checking
-        run: mypy --config-file=pyproject.toml .
+      - name: Run MyPy and check type coverage
+        run: |
+          mkdir -p reports
+          mypy --config-file=pyproject.toml --linecount-report reports .
+          total_line=$(tail -1 reports/linecount-report.txt | awk '{print $2}')
+          typed_line=$(tail -1 reports/linecount-report.txt | awk '{print $1}')
+          percent=$(echo "scale=2; 100 * $typed_line / $total_line" | bc)
+
+          echo "🔍 MyPy type coverage: $percent%"
+
+          required=90.00
+          if (( $(echo "$percent < $required" | bc -l) )); then
+            echo "❌ Type coverage ($percent%) is below threshold ($required%)"
+            exit 1
+          else
+            echo "✅ Type coverage is sufficient ($percent%)"
+          fi
 
   black:
     runs-on: ubuntu-latest
