@@ -1,44 +1,51 @@
 [tool.black]
 line-length = 120
-target-version = ["py312", ]
-exclude = ["venv","doc_artefacts"]
+target-version = ["py312"]
+exclude = '''
+/(
+    \.venv
+    |\.doc_artefacts
+    |venv
+    |__pycache__
+    |migrations
+)/
+'''
 
 [tool.isort]
 profile = "black"
 combine_as_imports = true
 multi_line_output = 3
-skip = ["venv","doc_artefacts" ]
+skip = [".venv", ".doc_artefacts"]
 line_length = 120
 
 [tool.autoflake]
 check = false
 in-place = true
 recursive = true
-exclude = ".venv/*,app/migrations/*,doc_artefacts/*"
+exclude = ".venv/*,.doc_artefacts/*,app/migrations/*"
 remove-all-unused-imports = true
 ignore-init-module-imports = true
 remove-duplicate-keys = true
 remove-unused-variables = true
 
 [tool.flake8]
-max-line-length = 120  # Установите желаемую максимальную длину строки
-ignore = ["E203", "E266", "E501","D104","D100","D106","D105"]  # Игнорируйте определенные ошибки
+max-line-length = 120
+ignore = ["E203", "E266", "E501", "D104", "D100", "D106", "D105"]
 exclude = [
-    ".venv/*",        # Исключаем все файлы в папке .venv
-    "__pycache__/*",  # Исключаем все файлы в папке __pycache__
-    "build/*",        # Исключаем все файлы в папке build
-    "dist/*",         # Исключаем все файлы в папке dist
-    "app/migrations/*",    # Исключаем все файлы в папке migrations
-    "doc_artefacts/*"
+    ".venv/*",
+    ".doc_artefacts/*",
+    "__pycache__/*",
+    "build/*",
+    "dist/*",
+    "app/migrations/*",
 ]
-builtins = ["Tweet"]
 
 [tool.mypy]
 plugins = [
-  "pydantic.mypy",
-  "sqlalchemy.ext.mypy.plugin"
+    "pydantic.mypy",
+    "sqlalchemy.ext.mypy.plugin",
 ]
-exclude = '(venv|test|tests|build|dist|\.venv|app/main\.py|app/migrations/env\.py,\.doc_artefacts/)'
+exclude = '(venv|\.venv|\.doc_artefacts|test|tests|build|dist|app/migrations/env\.py)'
 follow_imports = "silent"
 warn_redundant_casts = true
 ignore_missing_imports = true
