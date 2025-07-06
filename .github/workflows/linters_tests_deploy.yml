@@ -105,6 +105,12 @@ jobs:
       - name: Build and run Docker Compose
         run: |
           make up
+      - name: Wait for PostgreSQL to be ready
+        run: |
+          until pg_isready -h $DB_HOST -p $DB_PORT -U $DB_USER; do
+            echo "Waiting for DB..."
+            sleep 2
+          done
 
       - name: Run Tests with retries
         run: |
