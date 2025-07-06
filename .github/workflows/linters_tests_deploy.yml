@@ -108,9 +108,9 @@ jobs:
 
       - name: Wait for DB container to be healthy
         run: |
-          echo "Ждём, пока контейнер postgres_girumed станет healthy..."
+          echo "Ждём, пока контейнер $DB_TEST станет healthy..."
           for i in {1..15}; do
-            STATUS=$(docker inspect -f '{{.State.Health.Status}}' postgres_girumed)
+            STATUS=$(docker inspect -f '{{.State.Health.Status}}' $DB_TEST)
             echo "Текущий статус: $STATUS"
             if [ "$STATUS" == "healthy" ]; then
               echo "PostgreSQL готов!"
@@ -119,10 +119,10 @@ jobs:
             sleep 5
           done
 
-          STATUS=$(docker inspect -f '{{.State.Health.Status}}' postgres_girumed)
+          STATUS=$(docker inspect -f '{{.State.Health.Status}}' $DB_TEST)
           if [ "$STATUS" != "healthy" ]; then
             echo "PostgreSQL так и не стал healthy"
-            docker logs postgres_girumed
+            docker logs $DB_TEST
             exit 1
           fi
 
