@@ -79,7 +79,7 @@ class Appointment(Base):
     doctor: Mapped["Doctor"] = relationship(back_populates="appointments")
     patient: Mapped["Patient"] = relationship(back_populates="appointments")
 
-    __table_args__ = (UniqueConstraint("doctor_id", "start_time", name="unique_doctor_slot"),)
+    __table_args__ = (UniqueConstraint("doctor_id", "patient_id", name="unique_doctor_slot"),)
 
     def __repr__(self) -> str:
         """Строковое представление записи на приём."""
