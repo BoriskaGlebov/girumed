@@ -37,7 +37,7 @@ services:
     networks:
       - girumed_net
 
-  web:
+  api:
     image: boristhebladeglebov/girumed-app:latest
     #      build:
     #        context: .
