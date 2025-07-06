@@ -65,7 +65,7 @@ jobs:
 
     tests:
       runs-on: ubuntu-latest
-      #    needs: [ mypy, black, isort, flake8 ]  # Зависит от всех линтеров
+      needs: [ mypy, black, isort, flake8 ]  # Зависит от всех линтеров
       steps:
         - name: Checkout code
           uses: actions/checkout@v4
