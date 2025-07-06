@@ -108,6 +108,6 @@ jobs:
 
       - name: Run Tests with retries
         run: |
-          ENV=local alembic upgrade head
+          alembic upgrade head
 #          ENV=local pytest tests
 #          make test
