@@ -106,38 +106,38 @@ jobs:
         run: |
           make up
 
-          - name: Wait for DB container to be healthy
-            run: |
-              echo "Ждём, пока контейнер postgres_girumed станет healthy..."
-              for i in {1..15}; do
-                STATUS=$(docker inspect -f '{{.State.Health.Status}}' postgres_girumed)
-                echo "Текущий статус: $STATUS"
-                if [ "$STATUS" == "healthy" ]; then
-                  echo "PostgreSQL готов!"
-                  break
-                fi
-                sleep 5
-              done
+      - name: Wait for DB container to be healthy
+        run: |
+          echo "Ждём, пока контейнер postgres_girumed станет healthy..."
+          for i in {1..15}; do
+            STATUS=$(docker inspect -f '{{.State.Health.Status}}' postgres_girumed)
+            echo "Текущий статус: $STATUS"
+            if [ "$STATUS" == "healthy" ]; then
+              echo "PostgreSQL готов!"
+              break
+            fi
+            sleep 5
+          done
 
-              STATUS=$(docker inspect -f '{{.State.Health.Status}}' postgres_girumed)
-              if [ "$STATUS" != "healthy" ]; then
-                echo "PostgreSQL так и не стал healthy"
-                docker logs postgres_girumed
-                exit 1
-              fi
+          STATUS=$(docker inspect -f '{{.State.Health.Status}}' postgres_girumed)
+          if [ "$STATUS" != "healthy" ]; then
+            echo "PostgreSQL так и не стал healthy"
+            docker logs postgres_girumed
+            exit 1
+          fi
 
-          - name: Run Tests with retries
-            run: |
-              n=0
-              until [ $n -ge 3 ]
-              do
-                make test-CI && break
-                n=$((n+1))
-                echo "Тесты не прошли, попытка $n из 3"
-                sleep 5
-              done
+      - name: Run Tests with retries
+        run: |
+          n=0
+          until [ $n -ge 3 ]
+          do
+            make test-CI && break
+            n=$((n+1))
+            echo "Тесты не прошли, попытка $n из 3"
+            sleep 5
+          done
 
-              if [ $n -eq 3 ]; then
-                echo "Тесты не прошли после 3 попыток"
-                exit 1
-              fi
+          if [ $n -eq 3 ]; then
+            echo "Тесты не прошли после 3 попыток"
+            exit 1
+          fi
