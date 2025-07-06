@@ -104,7 +104,7 @@ jobs:
 
       - name: Build and run Docker Compose
         run: |
-          make up
+          make up && make test
 
       - name: Run Tests with retries
         run: |
