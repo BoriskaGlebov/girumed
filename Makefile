@@ -14,7 +14,7 @@ up:
 	docker compose up -d --build
 
 down:
-	@echo "Сворачиваю проект"
+	@echo "Сворачиваю проект c удалением всех volumes"
 	docker compose down -v
 lint:
 	@echo "🔍 Запуск линтеров через pre-commit..."
@@ -31,8 +31,8 @@ test-CI:
 check: lint test test-CI
 
 push:
-	@echo "📦 Собираем образ через docker compose..."
-	docker compose build
+	@echo "📦 Собираем образ из Dockerfile..."
+	docker build -t boristhebladeglebov/girumed-app:latest .
 
-	@echo "🚀 Пушим образ..."
+	@echo "🚀 Пушим образ на Docker Hub..."
 	docker push boristhebladeglebov/girumed-app:latest
