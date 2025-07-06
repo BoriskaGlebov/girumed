@@ -78,10 +78,10 @@ jobs:
         with:
           python-version: '3.12'  # Укажите версию Python
 
-#      - name: Install dependencies
-#        run: |
-#          python -m pip install --upgrade pip
-#          pip install -r requirements.txt
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
 
       - name: .env file create
         run: |
@@ -111,7 +111,7 @@ jobs:
           n=0
           until [ $n -ge 3 ]
           do
-            make test && break
+            make test-CI && break
             n=$((n+1))
             echo "Тесты не прошли, попытка $n из 3"
             sleep 5
