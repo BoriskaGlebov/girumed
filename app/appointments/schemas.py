@@ -17,7 +17,11 @@ class SAppointmentCreate(BaseModel):
     doctor_id: int
     patient_id: int
     start_time: Annotated[
-        datetime, Field(description="Время начала приёма. Формат: YYYY-MM-DD HH:MM", example="2025-07-05 10:30")
+        datetime,
+        Field(
+            description="Время начала приёма. Формат: YYYY-MM-DD HH:MM",
+            json_schema_extra={"example": "2025-07-05 10:30"},
+        ),
     ]
 
     @field_serializer("start_time")

@@ -1,6 +1,6 @@
-.PHONY: preprod
+.PHONY: up
 
-preprod:
+up:
 	@echo "📄 Копируем .env-template → .env"
 	@if [ -f .env-template ] && [ ! -f .env ]; then \
 		echo "📄 Копируем .env-template → .env"; \
@@ -17,6 +17,9 @@ preprod:
 	# Здесь укажи нужную команду, например:
 	# docker compose exec backend python manage.py migrate
 # Проверка кода линтерами и типами
+down:
+	@echo "Сворачиваю проект"
+	docker compose down -v
 lint:
 	@echo "🔍 Запуск линтеров через pre-commit..."
 	pre-commit run --all-files
@@ -28,3 +31,10 @@ test:
 
 # Полная проверка: линтеры + тесты
 check: lint test
+
+push:
+	@echo "📦 Собираем образ через docker compose..."
+	docker compose build
+
+	@echo "🚀 Пушим образ..."
+	docker push boristhebladeglebov/girumed-app:latest
